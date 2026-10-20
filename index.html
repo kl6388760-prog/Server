@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Swap Mini App</title>
+    <title>Crypto Bot Clone</title>
     
-    <!-- Подключение шрифта Inter -->
+    <!-- Подключение шрифта -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -15,22 +15,23 @@
     
     <style>
         :root {
-            /* Цвета из скриншота */
-            --bg-color: #131b23;
+            --bg-color: #0e1621; /* Темный фон Telegram */
             --text-main: #ffffff;
-            --text-muted: #8b9aa9;
-            --blue-accent: #2ea6de;
-            --max-color: #3b9cf6;
-            --input-bg: transparent;
+            --text-secondary: #7d8b99; /* Серый для мелкого текста */
+            --link-color: #3390ec; /* Синий для ссылок */
+            --error-color: #e83b3b; /* Красный для ошибки */
+            --btn-disabled-bg: #2b3a4a; /* Серый фон неактивной кнопки */
+            --btn-disabled-text: #7d8b99;
             --swap-icon-bg: #1c2b3a;
+            --nav-bg: #17212b;
+            --nav-active-bg: #2b3a4a;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            /* Применяем шрифт Inter */
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         body {
@@ -38,36 +39,43 @@
             color: var(--text-main);
             display: flex;
             flex-direction: column;
-            padding: 20px;
             height: 100vh;
             user-select: none;
-            -webkit-font-smoothing: antialiased; /* Для более четкого шрифта на iOS/Mac */
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Верхняя панель */
-        .header-row {
+        /* Контейнер для контента */
+        .content {
+            flex: 1;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* Верхние подписи */
+        .label-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 14px;
-            font-weight: 500; /* Inter Medium */
-            margin-bottom: 15px;
+            font-weight: 500;
+            margin-bottom: 8px;
             color: var(--text-main);
         }
 
         .max-btn {
-            color: var(--max-color);
-            font-weight: 600; /* Inter SemiBold */
             display: flex;
             align-items: center;
-            gap: 5px;
-            cursor: pointer;
+            color: var(--link-color);
+            font-weight: 500;
             font-size: 13px;
+            gap: 4px;
+            cursor: pointer;
         }
 
         .max-btn svg {
-            fill: var(--text-muted);
-            margin-right: 2px;
+            fill: var(--text-secondary);
         }
 
         /* Строка ввода */
@@ -75,58 +83,66 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 4px;
         }
 
         .token-select {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 24px;
-            font-weight: 600; /* Inter SemiBold */
-            cursor: pointer;
+            font-size: 22px;
+            font-weight: 600;
         }
 
         .token-select svg.chevron {
-            width: 14px;
-            height: 14px;
+            width: 16px;
+            height: 16px;
             stroke: var(--text-main);
             stroke-width: 2.5;
             fill: none;
-            margin-left: 2px;
+            margin-top: 2px;
         }
 
-        input[type="number"] {
-            background: var(--input-bg);
+        input[type="text"] {
+            background: transparent;
             border: none;
             outline: none;
-            color: var(--text-muted);
-            font-size: 42px;
-            font-weight: 500; /* Inter Medium */
+            color: var(--text-main);
+            font-size: 36px;
+            font-weight: 600;
             text-align: right;
             width: 60%;
             font-family: inherit;
-            /* Убираем стандартные стрелочки у input number */
+            padding: 0;
+        }
+        
+        input[type="text"]::placeholder {
+            color: var(--text-secondary);
         }
 
-        input[type="number"]::-webkit-inner-spin-button, 
-        input[type="number"]::-webkit-outer-spin-button { 
-            -webkit-appearance: none; 
-            margin: 0; 
+        /* Текст ошибки */
+        .error-text {
+            font-size: 13px;
+            color: var(--error-color);
+            text-align: right;
+            margin-bottom: 12px;
+            min-height: 16px;
         }
 
-        input[type="number"]:focus {
-            color: var(--text-main);
+        .error-text a {
+            color: var(--link-color);
+            text-decoration: none;
+            cursor: pointer;
         }
 
-        /* Кнопка обмена (Стрелочки) */
+        /* Блок обмена */
         .swap-container {
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
             height: 40px;
-            margin: 10px 0;
+            margin: 8px 0;
         }
 
         .swap-container::before {
@@ -136,151 +152,232 @@
             left: 0;
             right: 0;
             height: 1px;
-            background-color: #253442;
+            background-color: #1c2b3a;
             z-index: 1;
         }
 
         .swap-btn {
             background-color: var(--swap-icon-bg);
             border-radius: 50%;
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 2;
             cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        .swap-btn:active {
-            background-color: #253442;
+            border: none;
+            outline: none;
         }
 
         .swap-btn svg {
             width: 16px;
             height: 16px;
             fill: none;
-            stroke: var(--blue-accent);
+            stroke: #3b9cf6;
             stroke-width: 2;
             stroke-linecap: round;
             stroke-linejoin: round;
         }
 
-        /* Иконки токенов */
-        .token-icon {
+        /* Курс обмена */
+        .rate-info {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            margin-bottom: 16px;
+        }
+
+        .rate-info svg {
+            fill: var(--text-secondary);
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Кнопка Продолжить (неактивная) */
+        .submit-btn {
+            background-color: var(--btn-disabled-bg);
+            color: var(--btn-disabled-text);
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: auto; /* Прижимает к низу контентной части */
+            margin-bottom: 10px;
+            cursor: not-allowed;
+        }
+
+        /* Нижнее навигационное меню */
+        .bottom-nav {
+            background-color: var(--nav-bg);
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 16px 20px 16px; /* Отступ снизу для безопасной зоны iPhone */
+            border-top: 1px solid #1c2b3a;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-main);
+            font-size: 10px;
+            font-weight: 500;
+            text-decoration: none;
+            flex: 1;
+        }
+
+        .nav-icon-wrapper {
             width: 32px;
             height: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+        }
+
+        .nav-item.active .nav-icon-wrapper {
+            background-color: var(--nav-active-bg);
+            color: #3b9cf6;
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
         }
     </style>
 </head>
 <body>
 
-    <!-- Блок "Вы отправляете" -->
-    <div class="header-row">
-        <span>Вы отправляете</span>
-        <div class="max-btn" onclick="setMax()">
-            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2v-4H8v-2h2V8h2v3h2v2h-2v4z"/></svg>
-            0 МАКС
+    <div class="content">
+        <!-- Вы отправляете -->
+        <div class="label-row">
+            <span>Вы отправляете</span>
+            <div class="max-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2v-4H8v-2h2V8h2v3h2v2h-2v4z"/></svg>
+                0 МАКС
+            </div>
         </div>
+
+        <div class="input-row">
+            <div class="token-select">
+                <!-- Иконка GRAM (Toncoin стиль) -->
+                <svg width="28" height="28" viewBox="0 0 32 32">
+                    <circle cx="16" cy="16" r="16" fill="#0098EA"/>
+                    <path d="M16 6.5L9.5 14L16 18.5L22.5 14L16 6.5Z" fill="white"/>
+                    <path d="M16 25.5L9.5 18L16 22.5L22.5 18L16 25.5Z" fill="white" opacity="0.7"/>
+                </svg>
+                GRAM 
+                <svg class="chevron" viewBox="0 0 24 24"><path d="M9 18L15 12L9 6"/></svg>
+            </div>
+            <input type="text" id="send-input" value="10 000" readonly>
+        </div>
+        
+        <!-- Ошибка -->
+        <div class="error-text">
+            Недостаточный баланс. <a href="#">Пополнить</a>
+        </div>
+
+        <!-- Кнопка обмена -->
+        <div class="swap-container">
+            <button class="swap-btn">
+                <svg viewBox="0 0 24 24">
+                    <path d="M7 16V4M7 4L3 8M7 4L11 8M17 8V20M17 20L21 16M17 20L13 16"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Вы получаете -->
+        <div class="label-row" style="margin-top: 8px;">
+            <span>Вы получаете</span>
+        </div>
+
+        <div class="input-row">
+            <div class="token-select">
+                <!-- Иконка USDT -->
+                <svg width="28" height="28" viewBox="0 0 32 32">
+                    <circle cx="16" cy="16" r="16" fill="#26A17B"/>
+                    <path d="M18.5 13V10.5H22.5V7.5H9.5V10.5H13.5V13C10.2 13.2 7.8 13.9 7.8 14.8C7.8 15.7 10.2 16.4 13.5 16.6V23.5H18.5V16.6C21.8 16.4 24.2 15.7 24.2 14.8C24.2 13.9 21.8 13.2 18.5 13ZM16 15.6C12.9 15.6 10.4 15 10.4 14.3C10.4 13.6 12.9 13 16 13C19.1 13 21.6 13.6 21.6 14.3C21.6 15 19.1 15.6 16 15.6Z" fill="white"/>
+                </svg>
+                USDT 
+                <svg class="chevron" viewBox="0 0 24 24"><path d="M9 18L15 12L9 6"/></svg>
+            </div>
+            <input type="text" id="receive-input" value="13 104.728" readonly>
+        </div>
+
+        <!-- Информация о курсе -->
+        <div class="rate-info">
+            <svg viewBox="0 0 24 24"><path d="M4 17h16v2H4zm0-4h16v2H4zm0-4h16v2H4zm0-4h16v2H4z" opacity="0.5"/><path d="M12 6v12m-3-6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <span>1 GRAM ≈ 1.31 USDT</span>
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        </div>
+
+        <!-- Кнопка действия -->
+        <button class="submit-btn">Продолжить</button>
     </div>
 
-    <div class="input-row">
-        <div class="token-select">
-            <!-- Иконка GRAM -->
-            <svg class="token-icon" viewBox="0 0 32 32">
-                <circle cx="16" cy="16" r="16" fill="#2ea6de"/>
-                <path d="M16 6L9 15L16 19L23 15L16 6Z" fill="white"/>
-                <path d="M16 26L9 17L16 21L23 17L16 26Z" fill="white" opacity="0.7"/>
-            </svg>
-            GRAM 
-            <svg class="chevron" viewBox="0 0 24 24"><path d="M9 18L15 12L9 6"/></svg>
-        </div>
-        <input type="number" id="send-input" placeholder="0" value="0" oninput="calculateSwap()">
-    </div>
-
-    <!-- Разделитель с кнопкой обмена -->
-    <div class="swap-container">
-        <div class="swap-btn">
-            <svg viewBox="0 0 24 24">
-                <path d="M7 16V4M7 4L3 8M7 4L11 8M17 8V20M17 20L21 16M17 20L13 16"/>
-            </svg>
-        </div>
-    </div>
-
-    <!-- Блок "Вы получаете" -->
-    <div class="header-row" style="margin-top: 10px;">
-        <span>Вы получаете</span>
-    </div>
-
-    <div class="input-row">
-        <div class="token-select">
-            <!-- Иконка USDT -->
-            <svg class="token-icon" viewBox="0 0 32 32">
-                <circle cx="16" cy="16" r="16" fill="#26a17b"/>
-                <path d="M18.5 13V10.5H22.5V7.5H9.5V10.5H13.5V13C10.2 13.2 7.8 13.9 7.8 14.8C7.8 15.7 10.2 16.4 13.5 16.6V23.5H18.5V16.6C21.8 16.4 24.2 15.7 24.2 14.8C24.2 13.9 21.8 13.2 18.5 13ZM16 15.6C12.9 15.6 10.4 15 10.4 14.3C10.4 13.6 12.9 13 16 13C19.1 13 21.6 13.6 21.6 14.3C21.6 15 19.1 15.6 16 15.6Z" fill="white"/>
-            </svg>
-            USDT 
-            <svg class="chevron" viewBox="0 0 24 24"><path d="M9 18L15 12L9 6"/></svg>
-        </div>
-        <input type="number" id="receive-input" placeholder="0" value="0" readonly>
+    <!-- Нижнее меню (Имитация) -->
+    <div class="bottom-nav">
+        <a href="#" class="nav-item">
+            <div class="nav-icon-wrapper">
+                <svg viewBox="0 0 24 24"><path d="M19 7V4H5v3H2v13h20V7h-3zM5 5h14v2H5V5zm15 13H4v-7h16v7z"/></svg>
+            </div>
+            <span>Кошелек</span>
+        </a>
+        <a href="#" class="nav-item">
+            <div class="nav-icon-wrapper">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+            </div>
+            <span>Биржа</span>
+        </a>
+        <a href="#" class="nav-item active">
+            <div class="nav-icon-wrapper">
+                <svg viewBox="0 0 24 24"><path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z"/></svg>
+            </div>
+            <span>Обмен</span>
+        </a>
+        <a href="#" class="nav-item">
+            <div class="nav-icon-wrapper">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+            </div>
+            <span>P2P</span>
+        </a>
+        <a href="#" class="nav-item">
+            <div class="nav-icon-wrapper">
+                <svg viewBox="0 0 24 24"><path d="M6 14h2v4H6zm10 0h2v4h-2zm-5 0h2v4h-2zM4 8h16v2H4zm0-4h16v2H4z"/></svg>
+            </div>
+            <span>Ещё</span>
+        </a>
     </div>
 
     <script>
         // Инициализация Telegram Web App
         const tg = window.Telegram.WebApp;
-        
-        // Разворачиваем приложение на весь экран
         tg.expand();
-
-        // Устанавливаем цвет хедера (под цвет фона)
-        tg.setHeaderColor('#131b23');
-        tg.setBackgroundColor('#131b23');
-
-        // --- НАСТРОЙКА НАТИВНОЙ КНОПКИ TELEGRAM ---
-        const mainButton = tg.MainButton;
         
-        mainButton.setText("ПРОДОЛЖИТЬ");
-        mainButton.setParams({
-            color: '#2ea6de', 
-            text_color: '#ffffff',
-            is_active: true,
-            is_visible: true
+        // Устанавливаем цвета шапки под фон
+        tg.setHeaderColor('#0e1621');
+        tg.setBackgroundColor('#0e1621');
+        
+        // Скрываем нативную кнопку Telegram, так как мы используем красивую HTML кнопку
+        tg.MainButton.hide();
+        
+        // Примечание: В реальном приложении вы бы сделали кнопку активной, 
+        // если баланс достаточен, и добавили бы логику на клик:
+        document.querySelector('.submit-btn').addEventListener('click', () => {
+            if(document.querySelector('.submit-btn').style.backgroundColor !== 'var(--btn-disabled-bg)') {
+                 // Логика отправки
+                 tg.sendData(JSON.stringify({ action: "swap" }));
+            }
         });
-
-        // Обработчик нажатия на нативную кнопку
-        mainButton.onClick(function() {
-            const sendValue = document.getElementById('send-input').value;
-            const receiveValue = document.getElementById('receive-input').value;
-            
-            tg.sendData(JSON.stringify({
-                action: "swap",
-                from: "GRAM",
-                to: "USDT",
-                amountSend: sendValue,
-                amountReceive: receiveValue
-            }));
-        });
-
-        // --- ЛОГИКА ИНТЕРФЕЙСА ---
-
-        const exchangeRate = 0.85; 
-
-        function calculateSwap() {
-            const sendInput = document.getElementById('send-input');
-            const receiveInput = document.getElementById('receive-input');
-            
-            let val = parseFloat(sendInput.value);
-            if (isNaN(val)) val = 0;
-            
-            receiveInput.value = (val * exchangeRate).toFixed(2);
-        }
-
-        function setMax() {
-            const sendInput = document.getElementById('send-input');
-            sendInput.value = "1000"; 
-            calculateSwap();
-        }
     </script>
 </body>
 </html>
